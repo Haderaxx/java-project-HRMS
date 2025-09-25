@@ -1,4 +1,4 @@
--- Create employees table
+
 CREATE TABLE employees (
     employee_id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50),
@@ -10,13 +10,11 @@ CREATE TABLE employees (
     department VARCHAR(50)
 );
 
--- Create departments table
 CREATE TABLE departments (
     department_id INT AUTO_INCREMENT PRIMARY KEY,
     department_name VARCHAR(100)
 );
 
--- Create salaries table
 CREATE TABLE salaries (
     salary_id INT AUTO_INCREMENT PRIMARY KEY,
     employee_id INT,
@@ -24,3 +22,4 @@ CREATE TABLE salaries (
     effective_date DATE,
     FOREIGN KEY (employee_id) REFERENCES employees(employee_id)
 );
+
