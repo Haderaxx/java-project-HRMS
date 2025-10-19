@@ -5,14 +5,23 @@ import com.hrms.model.LeaveRequest;
 import java.util.List;
 
 public class LeaveService {
+
     private LeaveDAO leaveDAO = new LeaveDAO();
 
-    public void saveLeaveRequests(List<LeaveRequest> requests) {
-        leaveDAO.saveLeaves(requests);
+    public void applyLeave(LeaveRequest leaveRequest) {
+        leaveDAO.addLeave(leaveRequest);
     }
 
-    public List<LeaveRequest> getLeaveRequests() {
-        return leaveDAO.loadLeaves();
+    public List<LeaveRequest> getAllLeaves() {
+        return leaveDAO.getAllLeaves();
+    }
+
+    public void approveLeave(int leaveId) {
+        leaveDAO.updateLeaveStatus(leaveId, "Approved");
+    }
+
+    public void rejectLeave(int leaveId) {
+        leaveDAO.updateLeaveStatus(leaveId, "Rejected");
     }
 }
 

@@ -1,82 +1,75 @@
 package com.hrms.dao;
 
+import java.sql.*;
+import java.util.*;
 import com.hrms.model.Attendance;
 import com.hrms.util.DBConnection;
 
-import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-
 public class AttendanceDAO {
 
-    // Add attendance
-    public void markAttendance(Attendance attendance) {
-        String query = "INSERT INTO attendance (employee_id, date, status) VALUES (?, ?, ?)";
+    // Add new attendance record
+    public void addAttendance(Attendance attendance) {
+        String sql = "INSERT INTO attendance (employee_id, date, status) VALUES (?, ?, ?)";
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, attendance.getEmployeeId());
-            ps.setDate(2, attendance.getDate());
-            ps.setString(3, attendance.getStatus());
+            stmt.setInt(1, attendance.getEmployeeId());
+            stmt.setDate(2, java.sql.Date.valueOf(attendance.getDate())); // convert LocalDate/String to SQL Date
+            stmt.setString(3, attendance.getStatus());
+            stmt.executeUpdate();
 
-            ps.executeUpdate();
-            System.out.println("✅ Attendance marked for employee ID: " + attendance.getEmployeeId());
-
-        } catch (Exception e) {
+            System.out.println("✅ Attendance added for employee ID: " + attendance.getEmployeeId());
+        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
     // Get all attendance records
     public List<Attendance> getAllAttendance() {
-        List<Attendance> records = new ArrayList<>();
-        String query = "SELECT * FROM attendance";
+        List<Attendance> attendanceList = new ArrayList<>();
+        String sql = "SELECT * FROM attendance";
 
         try (Connection conn = DBConnection.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(query)) {
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Attendance att = new Attendance(
-                        rs.getInt("id"),
-                        rs.getInt("employee_id"),
-                        rs.getDate("date"),
-                        rs.getString("status")
-                );
-                records.add(att);
+                Attendance att = new Attendance();
+                att.setId(rs.getInt("id"));
+                att.setEmployeeId(rs.getInt("employee_id"));
+                att.setDate(rs.getDate("date").toString());
+                att.setStatus(rs.getString("status"));
+                attendanceList.add(att);
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return records;
+        return attendanceList;
     }
 
     // Get attendance by employee ID
     public List<Attendance> getAttendanceByEmployee(int empId) {
-        List<Attendance> records = new ArrayList<>();
-        String query = "SELECT * FROM attendance WHERE employee_id = ?";
+        List<Attendance> attendanceList = new ArrayList<>();
+        String sql = "SELECT * FROM attendance WHERE employee_id = ?";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(query)) {
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            ps.setInt(1, empId);
-            ResultSet rs = ps.executeQuery();
+            stmt.setInt(1, empId);
+            ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
-                records.add(new Attendance(
-                        rs.getInt("id"),
-                        rs.getInt("employee_id"),
-                        rs.getDate("date"),
-                        rs.getString("status")
-                ));
+                Attendance att = new Attendance();
+                att.setId(rs.getInt("id"));
+                att.setEmployeeId(rs.getInt("employee_id"));
+                att.setDate(rs.getDate("date").toString());
+                att.setStatus(rs.getString("status"));
+                attendanceList.add(att);
             }
-
-        } catch (Exception e) {
+        } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return records;
+        return attendanceList;
     }
 }
