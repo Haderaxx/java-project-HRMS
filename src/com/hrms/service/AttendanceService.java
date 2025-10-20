@@ -25,3 +25,4 @@ public class AttendanceService {
         return attendanceDAO.getAttendanceByEmployee(empId);
     }
 }
+
