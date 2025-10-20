@@ -5,24 +5,18 @@ import com.hrms.model.Attendance;
 import java.util.List;
 
 public class AttendanceService {
-
     private AttendanceDAO attendanceDAO = new AttendanceDAO();
 
-    // Mark attendance for multiple employees
+    // Save attendance for multiple records
     public void markAttendance(List<Attendance> attendanceList) {
-        for (Attendance att : attendanceList) {
-            attendanceDAO.markAttendance(att);
+        for (Attendance attendance : attendanceList) {
+            attendanceDAO.markAttendance(attendance);
         }
     }
 
-    // Get all attendance records
-    public List<Attendance> getAllAttendance() {
+    // Fetch all attendance records
+    public List<Attendance> getAttendanceRecords() {
         return attendanceDAO.getAllAttendance();
-    }
-
-    // Get attendance for a specific employee
-    public List<Attendance> getAttendanceByEmployee(int empId) {
-        return attendanceDAO.getAttendanceByEmployee(empId);
     }
 }
 
