@@ -1,121 +1,138 @@
 package com.hrms.controller;
 
-import com.hrms.service.PerformanceService;
-import com.hrms.model.PerformanceReview;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Scanner;
 
+import com.hrms.model.Employee;
+import com.hrms.model.Attendance;
+import com.hrms.model.LeaveRequest;
+import com.hrms.service.EmployeeService;
+import com.hrms.service.AttendanceService;
+import com.hrms.service.LeaveService;
+import com.hrms.service.PerformanceService;
 
 public class MainController {
 
-    private static PerformanceService performanceService = new PerformanceService();
-    private static Scanner sc = new Scanner(System.in);
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        EmployeeService employeeService = new EmployeeService();
+        AttendanceService attendanceService = new AttendanceService();
+        LeaveService leaveService = new LeaveService();
+        PerformanceService performanceService = new PerformanceService();
 
-    public static void performanceMenu() {
+        System.out.println("========= HR MANAGEMENT SYSTEM =========");
+
         while (true) {
-            System.out.println("\n=== Performance Reviews Menu ===");
-            System.out.println("1. Add Review");
-            System.out.println("2. View All Reviews");
-            System.out.println("3. View Reviews by Employee");
-            System.out.println("4. Update Review");
-            System.out.println("5. Delete Review");
-            System.out.println("6. Back to Main Menu");
-            System.out.print("Choose an option: ");
+            System.out.println("\n1️⃣  Add Employee");
+            System.out.println("2️⃣  View All Employees");
+            System.out.println("3️⃣  Mark Attendance");
+            System.out.println("4️⃣  View Attendance Records");
+            System.out.println("5️⃣  Apply Leave");
+            System.out.println("6️⃣  Approve/Reject Leave");
+            System.out.println("7️⃣  Exit");
+            System.out.print("👉 Choose an option: ");
+
             int choice = sc.nextInt();
             sc.nextLine(); // consume newline
 
             switch (choice) {
-                case 1:
-                    addReview();
+                case 1: {
+                    System.out.print("Enter Employee Name: ");
+                    String name = sc.nextLine();
+                    System.out.print("Enter Department: ");
+                    String dept = sc.nextLine();
+                    System.out.print("Enter Salary: ");
+                    double salary = sc.nextDouble();
+
+                    Employee emp = new Employee(name, dept, salary);
+                    employeeService.addEmployee(emp);
+                    System.out.println("✅ Employee added successfully!");
                     break;
-                case 2:
-                    viewAllReviews();
+                }
+
+                case 2: {
+                    List<Employee> employees = employeeService.getAllEmployees();
+                    System.out.println("\n========= EMPLOYEE LIST =========");
+                    for (Employee e : employees) {
+                        System.out.println(e);
+                    }
                     break;
-                case 3:
-                    viewReviewsByEmployee();
+                }
+
+                case 3: {
+                    System.out.print("Enter Employee ID: ");
+                    int empId = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter Status (Present/Absent): ");
+                    String status = sc.nextLine();
+
+                    Attendance att = new Attendance(empId, LocalDate.now().toString(), status);
+                    attendanceService.markAttendance(att);
+                    System.out.println("✅ Attendance recorded!");
                     break;
-                case 4:
-                    updateReview();
+                }
+
+                case 4: {
+                    List<Attendance> records = attendanceService.getAllAttendance();
+                    System.out.println("\n========= ATTENDANCE RECORDS =========");
+                    for (Attendance a : records) {
+                        System.out.println(a);
+                    }
                     break;
-                case 5:
-                    deleteReview();
+                }
+
+                case 5: {
+                    System.out.print("Enter Employee ID: ");
+                    int empId = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Enter Start Date (YYYY-MM-DD): ");
+                    String startDate = sc.nextLine();
+                    System.out.print("Enter End Date (YYYY-MM-DD): ");
+                    String endDate = sc.nextLine();
+                    System.out.print("Enter Reason: ");
+                    String reason = sc.nextLine();
+
+                    LeaveRequest leave = new LeaveRequest(empId, startDate, endDate, reason, "Pending", LocalDate.now().toString());
+                    leaveService.applyLeave(leave);
+                    System.out.println("✅ Leave request submitted successfully!");
                     break;
-                case 6:
-                    return; // back to main menu
+                }
+
+                case 6: {
+                    System.out.println("\n========= LEAVE REQUESTS =========");
+                    List<LeaveRequest> leaves = leaveService.getAllLeaves();
+                    for (LeaveRequest l : leaves) {
+                        System.out.println(l);
+                    }
+
+                    System.out.print("\nEnter Leave ID to update: ");
+                    int leaveId = sc.nextInt();
+                    sc.nextLine();
+                    System.out.print("Approve or Reject? (A/R): ");
+                    String decision = sc.nextLine().toUpperCase();
+
+                    if (decision.equals("A")) {
+                        leaveService.approveLeave(leaveId);
+                        System.out.println("✅ Leave approved!");
+                    } else if (decision.equals("R")) {
+                        leaveService.rejectLeave(leaveId);
+                        System.out.println("❌ Leave rejected!");
+                    } else {
+                        System.out.println("⚠️ Invalid choice.");
+                    }
+                    break;
+                }
+
+                case 7: {
+                    System.out.println("👋 Exiting HRMS... Goodbye!");
+                    sc.close();
+                    return;
+                }
+
                 default:
-                    System.out.println("Invalid choice! Try again.");
+                    System.out.println("⚠️ Invalid option, try again!");
             }
-        }
-    }
-
-    private static void addReview() {
-        System.out.print("Employee ID: ");
-        int empId = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Review ID: ");
-        int reviewId = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Feedback: ");
-        String feedback = sc.nextLine();
-        System.out.print("Rating (1-5): ");
-        int rating = sc.nextInt();
-        sc.nextLine();
-
-        PerformanceReview review = new PerformanceReview(reviewId, empId, feedback, rating);
-        performanceService.addPerformanceReview(review);
-        System.out.println("Review added successfully!");
-    }
-
-    private static void viewAllReviews() {
-        List<PerformanceReview> reviews = performanceService.getAllPerformanceReviews();
-        if (reviews.isEmpty()) {
-            System.out.println("No reviews found.");
-        } else {
-            reviews.forEach(System.out::println);
-        }
-    }
-
-    private static void viewReviewsByEmployee() {
-        System.out.print("Enter Employee ID: ");
-        int empId = sc.nextInt();
-        sc.nextLine();
-        List<PerformanceReview> reviews = performanceService.getReviewsByEmployee(empId);
-        if (reviews.isEmpty()) {
-            System.out.println("No reviews found for employee " + empId);
-        } else {
-            reviews.forEach(System.out::println);
-        }
-    }
-
-    private static void updateReview() {
-        System.out.print("Enter Review ID to update: ");
-        int reviewId = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Employee ID: ");
-        int empId = sc.nextInt();
-        sc.nextLine();
-        System.out.print("Updated Feedback: ");
-        String feedback = sc.nextLine();
-        System.out.print("Updated Rating (1-5): ");
-        int rating = sc.nextInt();
-        sc.nextLine();
-
-        PerformanceReview review = new PerformanceReview(reviewId, empId, feedback, rating);
-        if (performanceService.updatePerformanceReview(review)) {
-            System.out.println("Review updated successfully!");
-        } else {
-            System.out.println("Review ID not found.");
-        }
-    }
-
-    private static void deleteReview() {
-        System.out.print("Enter Review ID to delete: ");
-        int reviewId = sc.nextInt();
-        sc.nextLine();
-        if (performanceService.deletePerformanceReview(reviewId)) {
-            System.out.println("Review deleted successfully!");
-        } else {
-            System.out.println("Review ID not found.");
         }
     }
 }

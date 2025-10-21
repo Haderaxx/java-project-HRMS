@@ -1,15 +1,14 @@
 package com.hrms.service;
 
+import java.util.List;
 import com.hrms.dao.LeaveDAO;
 import com.hrms.model.LeaveRequest;
-import java.util.List;
 
 public class LeaveService {
-
     private LeaveDAO leaveDAO = new LeaveDAO();
 
-    public void applyLeave(LeaveRequest leaveRequest) {
-        leaveDAO.addLeave(leaveRequest);
+    public void applyLeave(LeaveRequest leave) {
+        leaveDAO.saveLeave(leave);
     }
 
     public List<LeaveRequest> getAllLeaves() {
@@ -24,4 +23,3 @@ public class LeaveService {
         leaveDAO.updateLeaveStatus(leaveId, "Rejected");
     }
 }
-
